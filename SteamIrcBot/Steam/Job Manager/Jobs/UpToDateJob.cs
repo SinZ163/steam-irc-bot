@@ -31,7 +31,7 @@ namespace SteamIrcBot
 
                 using ( dynamic steamApps = WebAPI.GetInterface( "ISteamApps" ) )
                 {
-                    steamApps.Timeout = ( int )TimeSpan.FromSeconds( 30 ).TotalMilliseconds;
+                    steamApps.Timeout = TimeSpan.FromSeconds(30);
 
                     KeyValue results = null;
 

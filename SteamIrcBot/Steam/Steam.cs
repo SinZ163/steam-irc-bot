@@ -7,6 +7,7 @@ using System.Reflection;
 using System.IO;
 using SteamKit2;
 using SteamKit2.Unified.Internal;
+using SteamKit2.Internal;
 
 namespace SteamIrcBot
 {
@@ -46,7 +47,7 @@ namespace SteamIrcBot
 
 
         bool loggedOn;
-        public bool Connected { get { return Client.ConnectedUniverse != EUniverse.Invalid && loggedOn; } }
+        public bool Connected { get { return loggedOn; } }
 
         bool shuttingDown = false;
 
@@ -100,21 +101,7 @@ namespace SteamIrcBot
         public void Connect()
         {
             JobManager.Start();
-
-            Log.WriteInfo( "Steam", "Retrieving servers..." );
-
-            // zzz
-            SteamDirectory.Initialize().ContinueWith( t =>
-            {
-                if (t.IsFaulted)
-                {
-                    Log.WriteInfo( "Steam", "Unable to retrieve servers: {0}", t.Exception );
-                }
-
-                Log.WriteInfo( "Steam", "Connecting..." );
-
-                nextConnect = DateTime.Now;
-            } );
+            nextConnect = DateTime.Now;
         }
 
         public void Disconnect()
@@ -201,15 +188,7 @@ namespace SteamIrcBot
         {
             loggedOn = false;
 
-            if ( callback.Result != EResult.OK )
-            {
-                Log.WriteWarn( "Steam", "Unable to connect to Steam3: {0}", callback.Result );
-
-                IRC.Instance.SendEmoteToTag( "steam-logon", "Unable to connect to Steam: {0}", callback.Result );
-                return;
-            }
-
-            Log.WriteInfo( "Steam", "Connected to Steam3: {0}", callback.Result );
+            Log.WriteInfo( "Steam", "Connected to Steam3 " );
 
             IRC.Instance.SendEmoteToTag( "steam-logon", "Connected to Steam! Logging on..." );
 
@@ -260,7 +239,8 @@ namespace SteamIrcBot
             Log.WriteInfo( "Steam", "Logged onto Steam3!" );
 
             IRC.Instance.SendEmoteToTag( "steam", "Logged on to Steam! Server time: {0}", callback.ServerTime );
-
+            ClientMsgProtobuf<CMsgClientUIMode> request = new ClientMsgProtobuf<CMsgClientUIMode>(EMsg.ClientCurrentUIMode) { Body = { chat_mode = 2 } };
+            Client.Send(request);
             JobManager.ForceRun<GameSessionJob>();
         }
 

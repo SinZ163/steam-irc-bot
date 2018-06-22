@@ -16,7 +16,7 @@
 	<!-- irc channels -->
 	<!-- ex:
 		<IRCChannels>
-			<Chan Channel="#opensteamworks" Tag="steam,steam-logon,main" />
+			<Chan Channel="#opensteamworks" Tags="steam,steam-logon,main" />
 		</IRCChannels>
 	-->
 	<IRCChannels>
